@@ -6,11 +6,17 @@ pragma solidity ^0.8.20;
  * @notice Egalitarian Token with Algorithmic Demurrage & Universal Dividend Redistribution.
  * @dev Enforces wealth-concentration limits, continuous idle decay, and equal flow to registered citizens.
  */
+interface ISovereignIdentity {
+    function hasValidIdentity(address wallet) external view returns (bool);
+}
+
 contract OmniEqualityLedger {
     string public name = "Omni Equality Token";
     string public symbol = "OEQ";
     uint8 public decimals = 18;
     uint256 public totalSupply;
+    ISovereignIdentity public immutable sovereignIdentity;
+    address public immutable registrar;
 
     // Holding threshold above which balances incur demurrage (e.g. 1,000,000 tokens)
     uint256 public constant WHALE_THRESHOLD = 1_000_000 * 10**18;
@@ -37,7 +43,10 @@ contract OmniEqualityLedger {
     event DemurrageAssessed(address indexed whale, uint256 amountDecayed, uint256 poolShare, uint256 legalShare, uint256 burned);
     event DividendsDistributed(uint256 totalDisbursed, uint256 perCitizenAmount);
 
-    constructor(uint256 initialGenesisSupply) {
+    constructor(uint256 initialGenesisSupply, address identityContract) {
+        require(identityContract != address(0) && identityContract.code.length > 0, "Invalid identity registry");
+        sovereignIdentity = ISovereignIdentity(identityContract);
+        registrar = msg.sender;
         totalSupply = initialGenesisSupply * 10**18;
         _balances[msg.sender] = totalSupply;
         lastDecayTimestamp[msg.sender] = block.timestamp;
@@ -45,6 +54,8 @@ contract OmniEqualityLedger {
     }
 
     function registerCitizen(address citizen) external {
+        require(msg.sender == registrar, "Only authorized registrar");
+        require(sovereignIdentity.hasValidIdentity(citizen), "Identity verification required");
         require(!isVerifiedCitizen[citizen], "Already registered");
         require(citizen != address(0), "Zero address");
         isVerifiedCitizen[citizen] = true;
