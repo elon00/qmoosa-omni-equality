@@ -103,9 +103,11 @@ class RealityGateRunner:
         assertion = citizen.create_assertion("Equitable Land & Resource Guarantee")
         assert_valid, _ = SoulboundCitizenIdentity.verify_assertion(assertion)
         pqc_ok = sig_valid and sig_tamper_rejected and assert_valid and (citizen.legal_weight == 1.0)
+        # A bespoke lattice construction is NOT NIST FIPS 204 ML-DSA-65.
+        # Functional signatures are insufficient evidence for production identity.
         self.record_step(
             "Layer 3: PQC Lattice Signatures",
-            pqc_ok,
+            False,
             f"Citizen ID={citizen.citizen_id[:14]}... Weight={citizen.legal_weight}"
         )
 
@@ -164,7 +166,10 @@ class RealityGateRunner:
             with open(sol_ledger, "r", encoding="utf-8") as fh:
                 l_text = fh.read()
                 contracts_ok = "distributeDemurrageDividends" in l_text and "isVerifiedCitizen" in l_text
-        self.record_step("Layer 6: Smart Contracts", contracts_ok, "Egalitarian Ledger & Soulbound ID verified")
+        # Source existence/string matching is not contract verification.
+        # Deployment approval must require actual compiler + runtime invariant tests.
+        self.record_step("Layer 6: Smart Contracts", False,
+                         "BLOCKED: Solidity compilation, authorization and invariant tests not proven")
 
         # -------------------------------------------------------------
         # LAYER 7: Pytest Full Suite Execution
@@ -187,7 +192,7 @@ class RealityGateRunner:
         all_passed = (self.passes == self.total)
         if all_passed:
             print("[SUCCESS] REALITY GATE PASSED: ALL 7 TECHNICAL LAYERS ARE GENUINE GREEN.")
-            print("          The system is mathematically and cryptographically certified.")
+            print("          Functional checks only; security certification requires independent evidence.")
             print("=" * 75 + "\n")
             return True
         else:
