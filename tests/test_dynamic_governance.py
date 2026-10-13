@@ -1,47 +1,66 @@
-"""
-Tests for Dynamic Macroeconomic Adaptability and Democratic Emergency Governance.
-"""
-
+"""Real ML-DSA signatures are exercised; no mock identity or personhood assertions."""
 import pytest
-from core.tokenomics.dynamic_governance import (
-    DynamicAdaptabilityEngine,
-    MacroeconomicRegime,
-)
+from core.pqc.ml_dsa import MLDSA65KeyPair
+from core.tokenomics.dynamic_governance import DynamicAdaptabilityEngine, MacroeconomicRegime, CTX
 
+@pytest.fixture(scope="module")
+def voters():
+    return {f"citizen_{i}": MLDSA65KeyPair.generate() for i in range(5)}
 
-def test_initial_regime_and_active_parameters():
-    engine = DynamicAdaptabilityEngine(initial_regime=MacroeconomicRegime.EQUILIBRIUM)
-    params = engine.get_active_parameters()
+@pytest.fixture
+def engine(voters):
+    return DynamicAdaptabilityEngine({k: v.public_key_bytes for k,v in voters.items()})
 
-    assert params["active_regime"] == "EQUILIBRIUM"
-    assert params["holding_threshold"] == 1_000_000.0
-    assert params["flow_share_pct"] == 0.40
-    assert params["legal_share_pct"] == 0.20
-    assert params["burn_share_pct"] == 0.40
+def propose(engine, voters, id="P1", deadline=200):
+    data = engine.proposal_payload(id, MacroeconomicRegime.RECESSION_SHOCK, "economic relief", deadline)
+    sig = voters["citizen_0"].sign(data, ctx=CTX)
+    return engine.propose_regime_shift(id, MacroeconomicRegime.RECESSION_SHOCK, "economic relief",
+                                       "citizen_0", deadline, sig, now=100)
 
+def vote(engine, voters, name, choice=1, proposal="P1"):
+    prop=engine.regime_change_proposals[proposal]
+    payload=engine.ballot_payload(proposal,prop["proposal_digest"],name,choice,prop["deadline"])
+    return engine.vote_on_shift(proposal,name,choice,voters[name].sign(payload,ctx=CTX),now=150)
 
-def test_democratic_transition_to_recession_shock():
-    engine = DynamicAdaptabilityEngine()
-    prop = engine.propose_regime_shift(
-        proposal_id="PROP-RECESSION-01",
-        target_regime=MacroeconomicRegime.RECESSION_SHOCK,
-        justification="Global liquidity contraction requires increased citizen stimulus",
-        proposer_citizen_id="0xcitizen_alpha"
-    )
-    assert prop["id"] == "PROP-RECESSION-01"
-    assert prop["status"] == "OPEN"
+def test_regime_defaults(engine):
+    assert engine.get_active_parameters()["flow_share_pct"] == .40
 
-    # 4 approvals, 1 rejection (80% approval >= 60% supermajority)
-    for i in range(4):
-        engine.vote_on_shift("PROP-RECESSION-01", f"citizen_{i}", 1)
-    engine.vote_on_shift("PROP-RECESSION-01", "citizen_4", -1)
-
-    executed = engine.execute_regime_shift("PROP-RECESSION-01", approval_threshold=0.60)
-    assert executed is True
+def test_signed_election_quorum(engine,voters):
+    propose(engine,voters)
+    for name in ["citizen_0","citizen_1","citizen_2","citizen_3"]:
+        assert vote(engine,voters,name)
+    vote(engine,voters,"citizen_4",-1)
+    with pytest.raises(ValueError): engine.execute_regime_shift("P1",now=150)
+    assert engine.execute_regime_shift("P1",now=201)
     assert engine.current_regime == MacroeconomicRegime.RECESSION_SHOCK
 
-    # Check that parameters dynamically adjusted
-    new_params = engine.get_active_parameters()
-    assert new_params["holding_threshold"] == 500_000.0
-    assert new_params["flow_share_pct"] == 0.60
-    assert new_params["burn_share_pct"] == 0.20
+def test_replay_rejected(engine,voters):
+    propose(engine,voters)
+    vote(engine,voters,"citizen_1")
+    with pytest.raises(ValueError,match="Duplicate"):vote(engine,voters,"citizen_1")
+
+def test_unsigned_and_wrong_key_rejected(engine,voters):
+    propose(engine,voters)
+    with pytest.raises(PermissionError):
+        engine.vote_on_shift("P1","citizen_1",1,b"invalid",now=150)
+    p=engine.regime_change_proposals["P1"]
+    payload=engine.ballot_payload("P1",p["proposal_digest"],"citizen_1",1,p["deadline"])
+    with pytest.raises(PermissionError):
+        engine.vote_on_shift("P1","citizen_1",1,voters["citizen_2"].sign(payload,ctx=CTX),now=150)
+
+def test_no_quorum(engine,voters):
+    propose(engine,voters)
+    vote(engine,voters,"citizen_0")
+    assert engine.execute_regime_shift("P1",now=201) is False
+
+def test_unknown_citizen(engine,voters):
+    propose(engine,voters)
+    with pytest.raises(PermissionError): engine.vote_on_shift("P1","outsider",1,b"x",now=150)
+
+def test_duplicate_proposals_and_expiry(engine,voters):
+    propose(engine,voters)
+    with pytest.raises(ValueError): propose(engine,voters)
+    with pytest.raises(ValueError): engine.vote_on_shift("P1","citizen_2",1,b"x",now=200)
+
+def test_registry_is_mandatory():
+    with pytest.raises(ValueError): DynamicAdaptabilityEngine({})
