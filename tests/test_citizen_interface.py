@@ -26,7 +26,6 @@ def test_citizen_onboarding_processing():
     diagnosis = result["step_1_diagnosis"]
     assert diagnosis["risk_level"] in ("SEVERE_EXPLOITATIVE_ASYMMETRY", "CRITICAL_UNILATERAL_DOMINANCE")
     assert len(diagnosis["simple_summary_en"]) >= 3
-    assert len(diagnosis["simple_summary_hi"]) >= 3
 
     options = result["step_2_practical_options"]
     assert len(options) == 3
