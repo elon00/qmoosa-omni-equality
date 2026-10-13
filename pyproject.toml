@@ -16,7 +16,10 @@ dependencies = [
     "qiskit-aer>=0.14.0",
     "fastapi>=0.110.0",
     "pydantic>=2.6.0",
-    "uvicorn>=0.28.0"
+    "uvicorn>=0.28.0",
+    "dilithium-py>=1.4.0",
+    "pycryptodome>=3.20.0",
+    "mldsa>=1.0.1"
 ]
 
 [project.optional-dependencies]

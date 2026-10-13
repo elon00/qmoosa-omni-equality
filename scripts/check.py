@@ -102,14 +102,31 @@ class RealityGateRunner:
         wrong_pair = MLDSA65KeyPair.generate()
         wrong_key_rejected = not MLDSA65KeyPair.verify(wrong_pair.public_key_bytes, test_payload, sig)
 
+        # Cross-implementation independent verifier check
+        import mldsa
+        cross_interop_ok = False
+        try:
+            vk = mldsa.VerificationKey(pair.public_key_bytes, parameters=mldsa.ParameterSet.ML_DSA_65)
+            vk.verify(sig, test_payload)
+            cross_interop_ok = True
+        except Exception:
+            cross_interop_ok = False
+
         citizen = SoulboundCitizenIdentity("human_proof_entropy_reality_check_01")
         assertion = citizen.create_assertion("Equitable Land & Resource Guarantee")
         assert_valid, _ = SoulboundCitizenIdentity.verify_assertion(assertion)
-        pqc_ok = sig_valid and sig_tamper_rejected and wrong_key_rejected and assert_valid and (citizen.legal_weight == 1.0)
+        pqc_ok = (
+            sig_valid
+            and sig_tamper_rejected
+            and wrong_key_rejected
+            and cross_interop_ok
+            and assert_valid
+            and (citizen.legal_weight == 1.0)
+        )
         self.record_step(
             "Layer 3: PQC Lattice Signatures",
             pqc_ok,
-            f"NIST FIPS 204 ML-DSA-65 Verified: Citizen ID={citizen.citizen_id[:14]}... Weight={citizen.legal_weight}"
+            f"NIST FIPS 204 ML-DSA-65 & Cross-Engine Verified: Citizen ID={citizen.citizen_id[:14]}... Weight={citizen.legal_weight}"
         )
 
         # -------------------------------------------------------------
