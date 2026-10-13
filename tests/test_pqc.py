@@ -24,6 +24,17 @@ def test_ml_dsa_65_signature_lifecycle():
     other_pair = MLDSA65KeyPair.generate()
     assert MLDSA65KeyPair.verify(other_pair.public_key_bytes, msg, sig) is False
 
+    # 4. Domain separation context verification
+    sig_ctx = pair.sign(msg, ctx=b"QMOOSA-BALLOT")
+    assert MLDSA65KeyPair.verify(pair.public_key_bytes, msg, sig_ctx, ctx=b"QMOOSA-BALLOT") is True
+    assert MLDSA65KeyPair.verify(pair.public_key_bytes, msg, sig_ctx, ctx=b"DIFFERENT-CONTEXT") is False
+
+    # 5. Malformed signature length or corrupted bit fails closed
+    corrupt_sig = bytearray(sig)
+    corrupt_sig[42] ^= 0xAA
+    assert MLDSA65KeyPair.verify(pair.public_key_bytes, msg, bytes(corrupt_sig)) is False
+    assert MLDSA65KeyPair.verify(pair.public_key_bytes, msg, sig[:-10]) is False
+
 
 def test_soulbound_identity_assertion():
     citizen = SoulboundCitizenIdentity("human_biometric_entropy_449201")

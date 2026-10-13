@@ -23,6 +23,11 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -33,6 +38,18 @@ jobs:
         run: |
           python -m pip install pip-audit
           pip-audit -r requirements.txt
+
+      - name: Run Cryptographic Interoperability Audit
+        run: |
+          python scripts/verify_crypto_interop.py
+
+      - name: Run Machine-Checked SMT/Z3 Formal Proofs
+        run: |
+          python proofs/verify_invariants_z3.py
+
+      - name: Run Foundry Smart Contract Invariant Tests
+        run: |
+          forge test -vvv
 
       - name: Run Fail-Closed Reality Gate Verification
         run: |

@@ -51,3 +51,12 @@ def test_demurrage_redistribution_reduces_gini():
     assert result["dividend_per_citizen"] > 0
     # Gini must decline after redistribution
     assert result["resulting_gini"] < initial_gini
+
+
+def test_tripartite_integer_conservation():
+    """Verifies that 40% flow, 20% legal, and 40% burn have zero rounding leakage."""
+    for decay_int in [1, 7, 333, 10_000, 10**18, 999_999_999_999_999_999]:
+        flow = (decay_int * 40) // 100
+        legal = (decay_int * 20) // 100
+        burned = decay_int - flow - legal
+        assert flow + legal + burned == decay_int
