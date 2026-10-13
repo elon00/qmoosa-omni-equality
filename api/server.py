@@ -108,5 +108,24 @@ def create_pqc_identity(entropy: str):
         "legal_weight": citizen.legal_weight,
         "verified": valid,
         "verification_message": msg,
-        "public_key_sample": citizen.public_key_t[:8].tolist(),
+        "public_key_hex": citizen.public_key_bytes.hex()[:32] + "...",
     }
+
+
+@app.post("/api/citizen/process-contract")
+def process_citizen_contract(req: LegalAuditRequest):
+    from core.legal_parity.citizen_interface import CitizenOnboardingEngine
+    engine = CitizenOnboardingEngine()
+    return engine.process_citizen_document(
+        document_text=req.contract_text,
+        citizen_id=req.citizen_id,
+        opposing_entity=req.opposing_entity,
+        document_title=req.contract_title,
+    )
+
+
+@app.get("/api/macro/active-regime")
+def get_macro_regime():
+    from core.tokenomics.dynamic_governance import DynamicAdaptabilityEngine
+    engine = DynamicAdaptabilityEngine()
+    return engine.get_active_parameters()
