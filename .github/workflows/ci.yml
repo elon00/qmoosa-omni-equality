@@ -34,6 +34,10 @@ jobs:
           python -m pip install pip-audit
           pip-audit -r requirements.txt
 
+      - name: Run Cryptographic Interoperability Audit
+        run: |
+          python scripts/verify_crypto_interop.py
+
       - name: Run Fail-Closed Reality Gate Verification
         run: |
           python scripts/check.py
