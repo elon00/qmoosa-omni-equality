@@ -1,32 +1,33 @@
 """
-Tests for OASIS Akoma Ntoso XML Legal Export.
+Tests for OASIS Akoma Ntoso XML Legal Export across multiple jurisdictions.
 """
 
 from core.legal_parity.akoma_ntoso import AkomaNtosoExporter
 from core.legal_parity.asymmetry_analyzer import LegalAsymmetryAuditor
 
 
-def test_akoma_ntoso_generation_and_validation():
+def test_akoma_ntoso_multijurisdiction():
     auditor = LegalAsymmetryAuditor()
     contract = (
-        "Tenant agrees to mandatory arbitration and waives trial by jury. "
-        "Landlord may unilaterally modify terms without notice. "
-        "Tenant waives class action participation."
+        "Tenant agrees to mandatory binding arbitration waiving jury trial. "
+        "Landlord reserves right to unilaterally modify terms without notice."
     )
     audit = auditor.audit_contract(contract)
 
-    xml_output = AkomaNtosoExporter.generate_unconscionability_doc(
-        citizen_id="0x998877665544332211",
-        opposing_entity="MegaCorp Real Estate Ltd.",
-        contract_title="Commercial Adhesion Lease",
-        audit_results=audit,
-        jurisdiction="US/NY"
-    )
+    for jurisdiction, statute_keyword in [
+        ("US", "Uniform Commercial Code § 2-302"),
+        ("EU", "Directive 93/13/EEC"),
+        ("IN", "Indian Contract Act, 1872"),
+        ("UK", "Consumer Rights Act 2015")
+    ]:
+        xml_output = AkomaNtosoExporter.generate_unconscionability_doc(
+            citizen_id="0x1234567890abcdef",
+            opposing_entity="MegaCorp Global",
+            contract_title="Standard Terms of Adhesion",
+            audit_results=audit,
+            jurisdiction=jurisdiction
+        )
 
-    assert "akomaNtoso" in xml_output
-    assert "FRBRWork" in xml_output
-    assert "NoticeOfUnconscionability" in xml_output
-    assert "MegaCorp Real Estate Ltd." in xml_output
-
-    is_valid = AkomaNtosoExporter.validate_akoma_ntoso_structure(xml_output)
-    assert is_valid is True
+        assert statute_keyword in xml_output
+        assert "NOTICE DISCLAIMER" in xml_output
+        assert AkomaNtosoExporter.validate_akoma_ntoso_structure(xml_output) is True
