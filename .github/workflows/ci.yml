@@ -2,9 +2,9 @@ name: Reality Gate CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ "**" ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ "**" ]
 
 jobs:
   reality-gate:
@@ -18,10 +18,16 @@ jobs:
           python-version: "3.11"
           cache: "pip"
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          npm install --no-audit solc@0.8.20
 
       - name: Check production dependency advisories
         run: |

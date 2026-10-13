@@ -1,31 +1,28 @@
 """
-Tests for Post-Quantum Lattice Signatures & Democratic Sovereign Identity.
+Comprehensive Test Suite for NIST FIPS 204 ML-DSA-65 & Soulbound Sovereign Identity.
 """
 
 import pytest
-from core.pqc.lattice_id import (
-    PostQuantumLatticeSigner,
-    SoulboundCitizenIdentity,
-)
+from core.pqc.ml_dsa import MLDSA65KeyPair
+from core.pqc.lattice_id import SoulboundCitizenIdentity
 from core.pqc.equal_rights import DemocraticParityLedger
 
 
-def test_lattice_signer_sign_and_verify():
-    signer = PostQuantumLatticeSigner(seed=b"test_entropy_seed_32_bytes_long!")
-    msg = b"Declaration of Universal Equal Rights"
+def test_ml_dsa_65_signature_lifecycle():
+    pair = MLDSA65KeyPair.generate()
+    msg = b"Universal Declaration of Human Equality & Socio-Economic Parity"
+    sig = pair.sign(msg)
 
-    sig = signer.sign(msg)
-    assert "z" in sig
-    assert "c_hash" in sig
-    assert "msg_hash" in sig
+    # 1. Valid signature verifies
+    assert MLDSA65KeyPair.verify(pair.public_key_bytes, msg, sig) is True
 
-    # Verify signature
-    is_valid = PostQuantumLatticeSigner.verify(signer.public_key_t, msg, sig)
-    assert is_valid is True
+    # 2. Tampered message fails verification
+    tampered_msg = b"Tampered Message: Wealthy Privilege Clause"
+    assert MLDSA65KeyPair.verify(pair.public_key_bytes, tampered_msg, sig) is False
 
-    # Tampered message must fail verification
-    is_valid_tampered = PostQuantumLatticeSigner.verify(signer.public_key_t, b"Altered Message", sig)
-    assert is_valid_tampered is False
+    # 3. Wrong public key fails verification
+    other_pair = MLDSA65KeyPair.generate()
+    assert MLDSA65KeyPair.verify(other_pair.public_key_bytes, msg, sig) is False
 
 
 def test_soulbound_identity_assertion():

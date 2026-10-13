@@ -38,9 +38,9 @@ Throughout human history, extreme wealth concentration has warped democratic gov
 │    Ising Hamiltonian │    NIST FIPS 204     │    UCC § 2-302 Unconscionable │
 │    Gini Minimization │    1-Human = 1-Vote  │    Adhesion Contract Defense  │
 ├──────────────────────┴──────────────────────┴───────────────────────────────┤
-│ 4. CONTINUOUS DEMURRAGE & EQUAL UNIVERSAL FLOW POOL                         │
+│ 4. CONTINUOUS DEMURRAGE & TRIPARTITE FLOW POOL (Resolution OEQ-GOV-2026-001)│
 │    B(t) = Theta + (B0 - Theta) * exp(-lambda * t)                           │
-│    50% Deflationary Burn | 50% Streamed to Soulbound Citizen Accounts       │
+│    40% Universal Flow | 20% Legal Defense Escrow | 40% Deflationary Burn     │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -51,7 +51,7 @@ $$H_C = \sum_{k} h_k \sigma_k^z + \sum_{k < l} J_{kl} \sigma_k^z \sigma_k^z + E_
 - Directly optimizes the **Rawlsian Maximin Floor** ($\min_i (w_i + x_i)$) and minimizes the **Gini Coefficient** ($G(X)$).
 
 ### 2. Post-Quantum Soulbound Citizen Identity (SBT)
-- Module-lattice digital signatures compliant with **NIST FIPS 204 (ML-DSA)** principles ($t = A \cdot s_1 \pmod q$).
+- Module-lattice digital signatures compliant with **NIST FIPS 204 (ML-DSA-65)** ($q = 8380417, K=6, L=5$).
 - Enforces the constitutional invariant: **Every human has exactly democratic weight = 1.0**.
 - Non-transferable, non-delegable, and immune to plutocratic capital scaling.
 
@@ -60,11 +60,12 @@ $$H_C = \sum_{k} h_k \sigma_k^z + \sum_{k < l} J_{kl} \sigma_k^z \sigma_k^z + E_
 - Computes the **Legal Asymmetry Index (LAI)** ($0.0 \le \text{LAI} \le 1.0$).
 - Synthesizes formal **Notices of Unconscionability** and binding **Bilateral Parity Riders** to eliminate legal disadvantage.
 
-### 4. Continuous Demurrage & Universal Dividend Flow
+### 4. Continuous Demurrage & Tripartite Flow (Policy Locked)
 - Idle balances exceeding the sovereign threshold ($\Theta = 1,000,000\text{ OEQ}$) incur continuous exponential decay:
   $$B(t) = \Theta + (B_0 - \Theta) e^{-\lambda t}$$
-- $50\%$ of decayed tokens are burned permanently (deflationary protection).
-- $50\%$ are disbursed equally as dividends to all verified Soulbound citizens.
+- **40% Universal Flow Dividend**: Streamed equally to all verified Soulbound citizen accounts.
+- **20% Legal Defense Escrow**: Subsidizes legal representation for citizens facing institutional litigation.
+- **40% Deflationary Burn**: Permanently burned from total supply. See [`docs/ACCOUNTING_POLICY.md`](docs/ACCOUNTING_POLICY.md).
 
 ---
 

@@ -82,14 +82,19 @@ class EgalitarianDemurragePool:
                 self.last_update[entity_id] = now
                 total_decay_collected += decay_amt
 
-        burned = total_decay_collected * (1.0 - self.redistribution_ratio)
-        recycled = total_decay_collected * self.redistribution_ratio
+        # Tripartite Egalitarian Split (matches OmniEqualityLedger.sol):
+        # 40% Universal Flow Pool, 20% Legal Defense Escrow, 40% Deflationary Burn
+        flow_share = total_decay_collected * 0.40
+        legal_share = total_decay_collected * 0.20
+        burned = total_decay_collected - flow_share - legal_share
+
         self.total_burned += burned
+        self.accumulated_pool += flow_share
 
         dividend_per_citizen = 0.0
         n_citizens = len(self.verified_citizens)
-        if n_citizens > 0 and recycled > 0:
-            dividend_per_citizen = recycled / n_citizens
+        if n_citizens > 0 and flow_share > 0:
+            dividend_per_citizen = flow_share / n_citizens
             for c_id in self.verified_citizens:
                 self.balances[c_id] = self.balances.get(c_id, 0.0) + dividend_per_citizen
                 self.last_update[c_id] = now
@@ -100,7 +105,8 @@ class EgalitarianDemurragePool:
             "timestamp": now,
             "total_decay_collected": float(total_decay_collected),
             "burned": float(burned),
-            "recycled_pool": float(recycled),
+            "universal_flow_pool": float(flow_share),
+            "legal_defense_escrow": float(legal_share),
             "num_verified_citizens": n_citizens,
             "dividend_per_citizen": float(dividend_per_citizen),
             "total_burned_cumulative": float(self.total_burned),
