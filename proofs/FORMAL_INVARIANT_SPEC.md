@@ -42,3 +42,20 @@ $$\forall D \in \mathbb{N}, \quad \text{FlowShare} + \text{LegalShare} + \text{B
 $$\text{where} \quad \text{FlowShare} = \lfloor \frac{40 D}{100} \rfloor, \quad \text{LegalShare} = \lfloor \frac{20 D}{100} \rfloor, \quad \text{BurnShare} = D - \text{FlowShare} - \text{LegalShare}$$
 * **Python Target:** `tests.test_demurrage::test_tripartite_integer_conservation()`
 * **Solidity Target:** `OmniEqualityLedger.sol` (Lines 104-106)
+
+---
+
+## 2. Machine-Checked Automated SMT Proofs (Z3 Theorem Prover)
+
+All core protocol invariants have been mathematically formalized and proven via Microsoft Z3 SMT Theorem Prover in [`proofs/verify_invariants_z3.py`](file:///C:/Users/marti/.gemini/antigravity/scratch/qmoosa-omni-equality/proofs/verify_invariants_z3.py).
+
+| Theorem | Formal Logic Description | Method | Proof Status |
+| :--- | :--- | :--- | :--- |
+| **Theorem 1: Total Supply Conservation** | $\forall b \in [0, S_t], (S_t - b) + (B_t + b) \equiv S_0$ | Z3 SMT Refutation | **PROVEN (unsat)** |
+| **Theorem 2: Zero-Loss Tripartite Rounding** | $\forall D \in \mathbb{Z}_{\ge 0}, \lfloor \frac{40D}{100} \rfloor + \lfloor \frac{20D}{100} \rfloor + \text{Burn} \equiv D$ | Z3 Integer Theory | **PROVEN (unsat)** |
+| **Theorem 3: Sovereign Asset Floor Invariant** | $\forall B \ge \Theta, B' \ge \Theta \land \forall B \le \Theta, B' \equiv B$ | Z3 Bound Analysis | **PROVEN (unsat)** |
+| **Theorem 4: Demurrage Solvency Invariant** | $\forall P \ge 0, N > 0, N \cdot \lfloor P / N \rfloor \le P \land P_{\text{rem}} \ge 0$ | Z3 Non-Deficit Check | **PROVEN (unsat)** |
+| **Theorem 5: Rawlsian Maximin Monotonicity** | $\forall X \in \mathbb{R}^N, d \ge 0, \min(X + d) \ge \min(X)$ | Z3 Real Arithmetic | **PROVEN (unsat)** |
+| **Theorem 6: Soulbound Democratic Parity** | $\forall i, j \in \text{Citizens}, w_i = 1.0 \land w_j = 1.0 \implies w_i - w_j \equiv 0$ | Z3 Parity Theory | **PROVEN (unsat)** |
+
+All 6 theorems evaluate to `unsat` upon negation, providing machine-checked mathematical proof that no counterexamples exist across infinite integer and real parameter spaces.

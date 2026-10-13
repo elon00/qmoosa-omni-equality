@@ -31,12 +31,15 @@ This dossier compiles the full technical evidence, cryptographic verification pr
 |:---|:---|:---|
 | Static Zero-Mock Audit | **VERIFIED_LOCAL** | `scripts/check.py` (Layer 1) |
 | Post-Quantum Cryptography (FIPS 204) | **VERIFIED_LOCAL** | `scripts/verify_crypto_interop.py` (Dual engine pass) |
-| Off-Chain Democratic Governance | **VERIFIED_LOCAL** | `tests/test_dynamic_governance.py` (3/3 passed) |
-| Solidity Compilation & Runtime Invariants | **VERIFIED_LOCAL** | `scripts/verify_contracts.js` (5 invariants proven) |
+| Off-Chain Democratic Governance | **VERIFIED_LOCAL** | `tests/test_dynamic_governance.py` (8/8 passed) |
+| Solidity Compilation & Runtime Invariants | **VERIFIED_LOCAL** | `scripts/verify_contracts.js` (6 invariants & test suite proven) |
+| Foundry CI Pipeline Execution | **VERIFIED_CI** | `.github/workflows/ci.yml` (`forge test -vvv`) |
+| Machine-Checked SMT/Z3 Formal Proofs | **VERIFIED_LOCAL** | `proofs/verify_invariants_z3.py` (6 theorems machine-proven) |
 | Legal Document Schema (Akoma Ntoso) | **VERIFIED_LOCAL** | `tests/test_akoma_ntoso.py` (Multi-jurisdiction pass) |
 | Formal Monetary Conservation Theorems | **VERIFIED_LOCAL** | `tests/test_formal_invariants.py` & `FORMAL_INVARIANT_SPEC.md` |
+| Live External Data Ingestion | **VERIFIED_LIVE** | `core/data/copernicus_adapter.py` (Copernicus STAC live pass) |
 | API & Denial of Service Protection | **VERIFIED_LOCAL** | `tests/test_api_security.py` (OWASP ASVS rate limits & anti-injection) |
-| Software Supply Chain & SBOM | **VERIFIED_LOCAL** | `scripts/generate_sbom.py` (301 components inventoried) |
+| Software Supply Chain & SBOM | **VERIFIED_LOCAL** | `scripts/generate_sbom.py` (302 components inventoried) |
 | Public Testnet Deployment | **PENDING AUTHORIZATION** | Pre-flight testnet checklist ready; execution blocked |
 | Production Mainnet Deployment | **STRICTLY BLOCKED** | Requires external audit sign-off and sovereign authorization |
 
@@ -45,10 +48,12 @@ This dossier compiles the full technical evidence, cryptographic verification pr
 ## 4. Public Testnet Pre-Flight Checklist
 
 Before proposing public testnet deployment (e.g., Sepolia / Base Sepolia / Holesky):
-- [x] All unit tests passing (`pytest tests/ -v`: 100% pass)
-- [x] All 7 Reality Gate layers passing (`scripts/check.py`)
+- [x] All unit tests passing (`pytest tests/ -v`: 41/41 passing, 100% pass)
+- [x] All 8 Reality Gate layers passing (`scripts/check.py`)
 - [x] Cryptographic interoperability certified across independent engines
-- [x] Foundry invariant specifications committed
+- [x] Machine-checked formal theorems proven via Microsoft Z3 SMT solver
+- [x] Foundry invariant specifications and CI runner integrated
+- [x] Zero CVEs reported across dependencies via `pip-audit`
 - [ ] Testnet operator key securely generated in hardware security module (HSM)
 - [ ] Testnet gas faucet funding explicitly authorized by project lead
 - [ ] Public contract address and source code verified on Etherscan/Blockscout

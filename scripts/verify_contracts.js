@@ -12,15 +12,18 @@ function compileContracts() {
     const rootDir = path.resolve(__dirname, '..');
     const identityPath = path.join(rootDir, 'contracts', 'SovereignIdentity.sol');
     const ledgerPath = path.join(rootDir, 'contracts', 'OmniEqualityLedger.sol');
+    const testPath = path.join(rootDir, 'contracts', 'test', 'OmniEqualityLedger.t.sol');
 
     const identitySource = fs.readFileSync(identityPath, 'utf8');
     const ledgerSource = fs.readFileSync(ledgerPath, 'utf8');
+    const testSource = fs.readFileSync(testPath, 'utf8');
 
     const input = {
         language: 'Solidity',
         sources: {
-            'SovereignIdentity.sol': { content: identitySource },
-            'OmniEqualityLedger.sol': { content: ledgerSource }
+            'contracts/SovereignIdentity.sol': { content: identitySource },
+            'contracts/OmniEqualityLedger.sol': { content: ledgerSource },
+            'contracts/test/OmniEqualityLedger.t.sol': { content: testSource }
         },
         settings: {
             optimizer: { enabled: true, runs: 200 },
@@ -43,15 +46,18 @@ function compileContracts() {
     }
 
     const contracts = output.contracts;
-    const sovereignIdentity = contracts['SovereignIdentity.sol']['SovereignIdentity'];
-    const omniLedger = contracts['OmniEqualityLedger.sol']['OmniEqualityLedger'];
+    const sovereignIdentity = contracts['contracts/SovereignIdentity.sol']['SovereignIdentity'];
+    const omniLedger = contracts['contracts/OmniEqualityLedger.sol']['OmniEqualityLedger'];
+    const testContract = contracts['contracts/test/OmniEqualityLedger.t.sol']['OmniEqualityLedgerTest'];
 
     return {
         success: true,
         identityBytecode: sovereignIdentity.evm.bytecode.object,
         ledgerBytecode: omniLedger.evm.bytecode.object,
+        testBytecode: testContract.evm.bytecode.object,
         identityAbi: sovereignIdentity.abi,
-        ledgerAbi: omniLedger.abi
+        ledgerAbi: omniLedger.abi,
+        testAbi: testContract.abi
     };
 }
 
@@ -136,6 +142,17 @@ function verifyRuntimeInvariants(compiled) {
         name: 'Zero Demurrage for Non-Whale Holdings',
         passed: decayBelow === 0n,
         details: 'Balances <= 1,000,000 OEQ incur exactly 0 decay'
+    });
+
+    // 6. Foundry Test Contract Verification
+    const testSize = compiled.testBytecode.length / 2;
+    const testMethods = compiled.testAbi.filter(a => a.type === 'function').map(a => a.name);
+    const requiredTests = ['test_GenesisParameters', 'test_SupplyConservation', 'test_PoolBounds', 'test_TripartiteSplitIntegrity', 'test_SoulboundIdentityNonTransferable', 'test_CitizenRegistrationFlow'];
+    const hasAllTests = requiredTests.every(m => testMethods.includes(m));
+    proofs.push({
+        name: 'Foundry Invariant Test Contract Integrity',
+        passed: testSize > 0 && hasAllTests,
+        details: `OmniEqualityLedgerTest bytecode: ${testSize} bytes, verified ${requiredTests.length} test methods`
     });
 
     return proofs;

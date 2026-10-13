@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.5",
-  "serialNumber": "urn:uuid:4c05e9e354406124767eb8bc9beb7471",
+  "serialNumber": "urn:uuid:5cba29bd597fd4185e2e4cfc43b8c50a",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-10-13T14:11:35Z",
+    "timestamp": "2026-10-13T18:14:01Z",
     "component": {
       "name": "qmoosa-omni-equality",
       "version": "1.0.0",
@@ -1811,6 +1811,12 @@
       "version": "1.2.4",
       "license": "MIT",
       "purl": "pkg:pypi/youtube-transcript-api@1.2.4"
+    },
+    {
+      "name": "z3-solver",
+      "version": "5.1.0.0",
+      "license": "MIT License",
+      "purl": "pkg:pypi/z3-solver@5.1.0.0"
     },
     {
       "name": "zipp",
