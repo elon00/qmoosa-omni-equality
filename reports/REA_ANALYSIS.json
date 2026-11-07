@@ -1,0 +1,140 @@
+{
+  "engine": "REA_Reverse_Engineer_Anything",
+  "status": "STRUCTURE_RECONSTRUCTED",
+  "analyzed_files": 44,
+  "manifest": {
+    "LICENSE": {
+      "bytes": 5135
+    },
+    "package.json": {
+      "bytes": 58
+    },
+    "pyproject.toml": {
+      "bytes": 632
+    },
+    "README.md": {
+      "bytes": 12579
+    },
+    "requirements.txt": {
+      "bytes": 156
+    },
+    "api\\server.py": {
+      "bytes": 4789
+    },
+    "api\\__init__.py": {
+      "bytes": 88
+    },
+    "contracts\\OmniEqualityLedger.sol": {
+      "bytes": 6949
+    },
+    "contracts\\SovereignIdentity.sol": {
+      "bytes": 2279
+    },
+    "core\\__init__.py": {
+      "bytes": 65
+    },
+    "docs\\ACCOUNTING_POLICY.md": {
+      "bytes": 1473
+    },
+    "docs\\ARCHITECTURE.md": {
+      "bytes": 3511
+    },
+    "docs\\CITIZEN_ONBOARDING_GUIDE.md": {
+      "bytes": 3761
+    },
+    "docs\\DYNAMIC_ADAPTABILITY.md": {
+      "bytes": 2546
+    },
+    "docs\\PRODUCTION_SECURITY_STATUS.md": {
+      "bytes": 2920
+    },
+    "docs\\WHITEPAPER.md": {
+      "bytes": 7951
+    },
+    "scripts\\check.py": {
+      "bytes": 10620
+    },
+    "scripts\\rea_inspector.py": {
+      "bytes": 1485
+    },
+    "scripts\\rsi_engine.py": {
+      "bytes": 2039
+    },
+    "scripts\\run_quantum_equality.py": {
+      "bytes": 4794
+    },
+    "scripts\\verify_contracts.js": {
+      "bytes": 6748
+    },
+    "tests\\test_citizen_interface.py": {
+      "bytes": 1659
+    },
+    "tests\\test_demurrage.py": {
+      "bytes": 2051
+    },
+    "tests\\test_dynamic_governance.py": {
+      "bytes": 1803
+    },
+    "tests\\test_legal_parity.py": {
+      "bytes": 2913
+    },
+    "tests\\test_pqc.py": {
+      "bytes": 2517
+    },
+    "tests\\test_quantum.py": {
+      "bytes": 2413
+    },
+    ".github\\workflows\\ci.yml": {
+      "bytes": 918
+    },
+    ".github\\workflows\\qmoosa-rsi-rea-sync.yml": {
+      "bytes": 531
+    },
+    "core\\legal_parity\\asymmetry_analyzer.py": {
+      "bytes": 3598
+    },
+    "core\\legal_parity\\auto_advocate.py": {
+      "bytes": 5015
+    },
+    "core\\legal_parity\\citizen_interface.py": {
+      "bytes": 4547
+    },
+    "core\\legal_parity\\__init__.py": {
+      "bytes": 346
+    },
+    "core\\pqc\\equal_rights.py": {
+      "bytes": 3618
+    },
+    "core\\pqc\\lattice_id.py": {
+      "bytes": 2853
+    },
+    "core\\pqc\\ml_dsa.py": {
+      "bytes": 8218
+    },
+    "core\\pqc\\__init__.py": {
+      "bytes": 380
+    },
+    "core\\quantum\\hamiltonian.py": {
+      "bytes": 8475
+    },
+    "core\\quantum\\metrics.py": {
+      "bytes": 3242
+    },
+    "core\\quantum\\qaoa_solver.py": {
+      "bytes": 5666
+    },
+    "core\\quantum\\__init__.py": {
+      "bytes": 505
+    },
+    "core\\tokenomics\\demurrage_engine.py": {
+      "bytes": 4873
+    },
+    "core\\tokenomics\\dynamic_governance.py": {
+      "bytes": 5287
+    },
+    "core\\tokenomics\\__init__.py": {
+      "bytes": 309
+    }
+  },
+  "timestamp": 1794023542
+}
